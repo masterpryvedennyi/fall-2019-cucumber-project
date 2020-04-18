@@ -3,7 +3,7 @@ Feature: Login
   As a user,
   I should be able to login to the application
 
-  @librarian
+  @librarian @staff
   Scenario: Login as librarian
     Given I am on the login page
     When I login as a librarian user
@@ -15,7 +15,7 @@ Feature: Login
     When I login as a student
     Then dashboard page should be displayed
 
-  @admin
+  @admin  @staff
   Scenario: Login as an admin
     Given I am on the login page
     When I login as an admin
