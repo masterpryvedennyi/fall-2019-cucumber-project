@@ -34,6 +34,12 @@ public class AddUsersStepDefs {
 
         String expectedPassword = fields.get("password");
         String actualPassword = usersPage.password.getAttribute("placeholder");
-        assertEquals("Password placeholder assertion failed" , expectedPassword, actualPassword);
+        assertEquals("Password  placeholder assertion failed" , expectedPassword, actualPassword);
+
+
+        String actualAddress = usersPage.address.getAttribute("placeholder");
+        assertEquals("Address placeholder must be empty", "", actualAddress);
     }
+
+
 }

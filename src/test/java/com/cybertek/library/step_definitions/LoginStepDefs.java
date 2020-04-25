@@ -26,14 +26,11 @@ public class LoginStepDefs {
         Driver.getDriver().get(url);
     }
 
-    @When("I login as a librarian user")
-    public void i_login_as_a_librarian_user() {
-        System.out.println("Logging in as librarian");
+    @When("I login as a librarian")
+    public void i_login_as_a_librarian() {
         String email = ConfigurationReader.getProperty("librarian_email");
         String password = ConfigurationReader.getProperty("librarian_password");
-        loginPage.email.sendKeys(email);
-        loginPage.password.sendKeys(password);
-        loginPage.signIn.click();
+        loginPage.login(email, password);
 
     }
     @Then("dashboard page should be displayed")
@@ -47,21 +44,25 @@ public class LoginStepDefs {
 
     @When("I login as a student")
     public void i_login_as_a_student() {
-        System.out.println("Logging in as a student");
+        String email = ConfigurationReader.getProperty("student_email");
+        String password = ConfigurationReader.getProperty("student_password");
+        loginPage.login(email, password);
     }
 
     @When("I login as an admin")
     public void i_login_as_an_admin() {
-        System.out.println("Logging in as an admin");
+        String email = ConfigurationReader.getProperty("admin_email");
+        String password = ConfigurationReader.getProperty("admin_password");
+        loginPage.login(email, password);
     }
 
     @Given("I login using following credentials:")
     public void i_login_using_following_credentials(Map<String, String> credentials) {
-        System.out.println(credentials);
         String email = credentials.get("email");
         String password = credentials.get("password");
-        System.out.println("email = " + email);
-        System.out.println("password = " + password);
         loginPage.login(email, password);
     }
+
+
+
 }

@@ -12,6 +12,7 @@ import java.util.List;
 
 public class PageNavigationStepDefs {
     DashboardPage dashBoardPage = new DashboardPage();
+    UsersPage usersPage = new UsersPage();
 
     @When("I click on {string} link")
     public void i_click_on_link(String link) {
@@ -60,5 +61,17 @@ public class PageNavigationStepDefs {
         System.out.println(options);
     }
 
+    @When("I select Show {int} records")
+    public void i_select_Show_records(Integer option) {
+        usersPage.getShowRecords().selectByVisibleText(option.toString());
+    }
+
+    @Then("the users table must display {int} records")
+    public void the_users_table_must_display_records(int expectedCount) {
+        BrowserUtils.wait(1);
+        int actualCount = usersPage.allRows.size();
+        Assert.assertEquals(expectedCount, actualCount);
+
+    }
 
 }

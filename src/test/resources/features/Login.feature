@@ -6,7 +6,7 @@ Feature: Login
   @librarian @staff
   Scenario: Login as librarian
     Given I am on the login page
-    When I login as a librarian user
+    When I login as a librarian
     Then dashboard page should be displayed
 
   @student

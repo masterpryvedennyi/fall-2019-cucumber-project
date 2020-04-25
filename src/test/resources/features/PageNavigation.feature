@@ -3,7 +3,7 @@ Feature: Page navigation links
 
   Background:
     Given I am on the login page
-    And I login as a librarian user
+    And I login as a librarian
 
   @db
   Scenario: Go to users page

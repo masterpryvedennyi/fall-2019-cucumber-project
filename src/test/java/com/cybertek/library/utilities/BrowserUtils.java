@@ -1,61 +1,199 @@
 package com.cybertek.library.utilities;
 
 import org.apache.commons.io.FileUtils;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.openqa.selenium.support.ui.WebDriverWait;
+import org.junit.Assert;
+import org.openqa.selenium.*;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
+import java.util.function.Function;
+
+import static org.junit.Assert.assertTrue;
 
 public class BrowserUtils {
-    /**
-     * Pause test for some time
-     *
-     * @param seconds
-     */
-    public static void wait(int seconds) {
+    public static void wait(int secs) {
         try {
-            Thread.sleep(1000 * seconds);
+            Thread.sleep(1000 * secs);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
-    /**
-     * @param elements represents collection of WebElements
-     * @return collection of strings
+    /*
+     * switches to new window by the exact title
+     * returns to original window if windows with given title not found
      */
-    public static List<String> getElementsText(List<WebElement> elements) {
-        List<String> textValues = new ArrayList<>();
-        for (WebElement element : elements) {
-            if (!element.getText().isEmpty()) {
-                textValues.add(element.getText());
+    public static void switchToWindow(String targetTitle) {
+        String origin = Driver.getDriver().getWindowHandle();
+        for (String handle : Driver.getDriver().getWindowHandles()) {
+            Driver.getDriver().switchTo().window(handle);
+            if (Driver.getDriver().getTitle().equals(targetTitle)) {
+                return;
             }
         }
-        return textValues;
+        Driver.getDriver().switchTo().window(origin);
+    }
+
+    public static void hover(WebElement element) {
+        Actions actions = new Actions(Driver.getDriver());
+        actions.moveToElement(element).perform();
     }
 
     /**
-     * waits for backgrounds processes on the browser to complete
+     * return a list of string from a list of web elements
      *
-     * @param timeOutInSeconds
+     * @param list
+     * @return
      */
+    public static List<String> getElementsText(List<WebElement> list) {
+        List<String> elemTexts = new ArrayList<>();
+        for (WebElement el : list) {
+            elemTexts.add(el.getText());
+        }
+        return elemTexts;
+    }
+
+    public static List<String> getElementsText(By locator) {
+
+        List<WebElement> elems = Driver.getDriver().findElements(locator);
+        List<String> elemTexts = new ArrayList<>();
+
+        for (WebElement el : elems) {
+            elemTexts.add(el.getText());
+        }
+        return elemTexts;
+    }
+
+    public static WebElement waitForVisibility(WebElement element, int timeToWaitInSec) {
+        WebDriverWait wait = new WebDriverWait(Driver.getDriver(), timeToWaitInSec);
+        return wait.until(ExpectedConditions.visibilityOf(element));
+    }
+
+    public static WebElement waitForVisibility(By locator, int timeout) {
+        WebDriverWait wait = new WebDriverWait(Driver.getDriver(), timeout);
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+    }
+
+    public static WebElement waitForClickability(WebElement element, int timeout) {
+        WebDriverWait wait = new WebDriverWait(Driver.getDriver(), timeout);
+        return wait.until(ExpectedConditions.elementToBeClickable(element));
+    }
+
+    public static WebElement waitForClickability(By locator, int timeout) {
+        WebDriverWait wait = new WebDriverWait(Driver.getDriver(), timeout);
+        return wait.until(ExpectedConditions.elementToBeClickable(locator));
+    }
+
     public static void waitForPageToLoad(long timeOutInSeconds) {
-        ExpectedCondition<Boolean> expectation = driver -> ((JavascriptExecutor) driver).executeScript("return document.readyState").equals("complete");
+        ExpectedCondition<Boolean> expectation = new ExpectedCondition<Boolean>() {
+            public Boolean apply(WebDriver driver) {
+                return ((JavascriptExecutor) driver).executeScript("return document.readyState").equals("complete");
+            }
+        };
         try {
+            System.out.println("Waiting for page to load...");
             WebDriverWait wait = new WebDriverWait(Driver.getDriver(), timeOutInSeconds);
             wait.until(expectation);
         } catch (Throwable error) {
-            error.printStackTrace();
+            System.out.println(
+                    "Timeout waiting for Page Load Request to complete after " + timeOutInSeconds + " seconds");
         }
+    }
+
+    public static WebElement fluentWait(final WebElement webElement, int timeinsec) {
+        FluentWait<WebDriver> wait = new FluentWait<WebDriver>(Driver.getDriver())
+                .withTimeout(Duration.ofSeconds(timeinsec))
+                .pollingEvery(Duration.ofMillis(500))
+                .ignoring(NoSuchElementException.class);
+        WebElement element = wait.until(new Function<WebDriver, WebElement>() {
+            public WebElement apply(WebDriver driver) {
+                return webElement;
+            }
+        });
+        return element;
+    }
+
+    /**
+     * Verifies whether the element matching the provided locator is displayed on page
+     * fails if the element matching the provided locator is not found or not displayed
+     *
+     * @param by
+     */
+    public static void verifyElementDisplayed(By by) {
+        try {
+            assertTrue("Element not visible: " + by, Driver.getDriver().findElement(by).isDisplayed());
+        } catch (NoSuchElementException e) {
+            Assert.fail("Element not found: " + by);
+
+        }
+    }
+
+    /**
+     * Verifies whether the element is displayed on page
+     * fails if the element is not found or not displayed
+     *
+     * @param element
+     */
+    public static void verifyElementDisplayed(WebElement element) {
+        try {
+            assertTrue("Element not visible: " + element, element.isDisplayed());
+        } catch (NoSuchElementException e) {
+            Assert.fail("Element not found: " + element);
+
+        }
+    }
+
+
+    /**
+     * Waits for element to be not stale
+     *
+     * @param element
+     */
+    public void waitForStaleElement(WebElement element) {
+        int y = 0;
+        while (y <= 15) {
+            if (y == 1)
+                try {
+                    element.isDisplayed();
+                    break;
+                } catch (StaleElementReferenceException st) {
+                    y++;
+                    try {
+                        Thread.sleep(300);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                } catch (WebDriverException we) {
+                    y++;
+                    try {
+                        Thread.sleep(300);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+        }
+    }
+
+    /**
+     * Selects a random value from a dropdown list and returns the selected Web Element
+     *
+     * @param select
+     * @return
+     */
+    public WebElement selectRandomTextFromDropdown(Select select) {
+        Random random = new Random();
+        List<WebElement> weblist = select.getOptions();
+        int optionIndex = 1 + random.nextInt(weblist.size() - 1);
+        select.selectByIndex(optionIndex);
+        return select.getFirstSelectedOption();
     }
 
     /**
@@ -63,72 +201,55 @@ public class BrowserUtils {
      *
      * @param element
      */
-    public static void clickWithJS(WebElement element) {
+    public void clickWithJS(WebElement element) {
         ((JavascriptExecutor) Driver.getDriver()).executeScript("arguments[0].scrollIntoView(true);", element);
         ((JavascriptExecutor) Driver.getDriver()).executeScript("arguments[0].click();", element);
     }
 
+
     /**
-     * Scroll to element using JavaScript
+     * Scrolls down to an element using JavaScript
      *
      * @param element
      */
-    public static void scrollTo(WebElement element) {
+    public void scrollToElement(WebElement element) {
         ((JavascriptExecutor) Driver.getDriver()).executeScript("arguments[0].scrollIntoView(true);", element);
     }
 
     /**
-     * @param name screenshot name
-     * @return path to the screenshot
+     * Performs double click action on an element
+     *
+     * @param element
      */
-    /*
-    public static String getScreenshot(String name) {
-        //adding date and time to screenshot name, to make screenshot unique
-        name = new Date().toString().replace(" ", "_").replace(":", "-") + "_" + name;
-        //where we gonna store a screenshot
-        String path = "";
+    public void doubleClick(WebElement element) {
+        new Actions(Driver.getDriver()).doubleClick(element).build().perform();
+    }
 
-        if (System.getProperty("os.name").toLowerCase().contains("mac")) {
-            path = System.getProperty("user.dir") + "/test-output/screenshots/" + name + ".png";
+    /**
+     * Changes the HTML attribute of a Web Element to the given value using JavaScript
+     *
+     * @param element
+     * @param attributeName
+     * @param attributeValue
+     */
+    public void setAttribute(WebElement element, String attributeName, String attributeValue) {
+        ((JavascriptExecutor) Driver.getDriver()).executeScript("arguments[0].setAttribute(arguments[1], arguments[2]);", element, attributeName, attributeValue);
+    }
+
+    /**
+     * @param element
+     * @param check
+     */
+    public void selectCheckBox(WebElement element, boolean check) {
+        if (check) {
+            if (!element.isSelected()) {
+                element.click();
+            }
         } else {
-            path = System.getProperty("user.dir") + "\\test-output\\screenshots\\" + name + ".png";
+            if (element.isSelected()) {
+                element.click();
+            }
         }
-
-        System.out.println("OS name: " + System.getProperty("os.name"));
-        System.out.println("Screenshot is here: " + path);
-        //since our reference type is a WebDriver
-        //we cannot see methods from TakesScreenshot interface
-        //that's why do casting
-        TakesScreenshot takesScreenshot = (TakesScreenshot) Driver.getDriver();
-        //take screenshot of web browser, and save it as a file
-        File source = takesScreenshot.getScreenshotAs(OutputType.FILE);
-        //where screenshot will be saved
-        File destination = new File(path);
-        try {
-            //copy file to the previously specified location
-            FileUtils.copyFile(source, destination);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return path;
     }
-    */
 
-
-    public static String getScreenshot(String name) throws IOException {
-        // name the screenshot with the current date time to avoid duplicate name
-        String date = new SimpleDateFormat("yyyyMMddhhmmss").format(new Date());
-        // TakesScreenshot ---> interface from selenium which takes screenshots
-        TakesScreenshot ts = (TakesScreenshot) Driver.getDriver();
-        File source = ts.getScreenshotAs(OutputType.FILE);
-        // full path to the screenshot location
-        String target = System.getProperty("user.dir") + "/test-output/Screenshots/" + name + date + ".png";
-        File finalDestination = new File(target);
-        // save the screenshot to the path given
-        FileUtils.copyFile(source, finalDestination);
-        return target;
-    }
 }
-
-
-

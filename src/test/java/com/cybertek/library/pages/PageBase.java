@@ -22,4 +22,8 @@ public abstract class PageBase {
     @FindBy(tagName = "h3")
     public WebElement pageHeader;
 
+    @FindBy(css = "#navbarDropdown>span")
+    public WebElement accountHolderName;
+
+
 }

@@ -6,17 +6,11 @@ import org.junit.runner.RunWith;
 
 @RunWith(Cucumber.class)
 @CucumberOptions(
-        plugin = {"html:target/default-cucumber-reports",
-                "rerun:target/rerun.txt"
+        plugin = {"html:target/default-cucumber-reports"
         },
-        features = "src/test/resources/features",
         glue = "com/cybertek/library/step_definitions",
-        dryRun = false,
-        tags = "@regression"
+        features = "@target/rerun.txt"
 )
-public class CukesRunner {
+public class FailedTestRunner {
 
 }
-
-
-
