@@ -1,13 +1,13 @@
 Feature: User account tests
 
-  @wip
+  @regression
   Scenario: Verify user information
     Given I am on the login page
     When I login using "librarian12@library" and "AOYKYTMJ"
     Then account holder name should be "Test Librarian 12"
 
     #Test case
-  @wip
+  @regression
   Scenario Outline: Verify user information 2
     Given I am on the login page
     When I login using "<email>" and "<password>"
@@ -70,7 +70,7 @@ Feature: User account tests
       | student30@library | IaT9YI0I | Test Student 30 |
 
 
-  @wip
+  @regression
   Scenario Outline: Verify dashboard page
     Given I am on the login page
     When I login as a <user>

@@ -1,11 +1,11 @@
-@regression @smoke
+ @smoke
 Feature: Show records functionality
 
   Background:
     Given I am on the login page
     And I login as a librarian
 
-  @wip
+  @regression
   Scenario: verify default values in Users page
 #    When I click on "Users" link
     Then show records default value should be 10

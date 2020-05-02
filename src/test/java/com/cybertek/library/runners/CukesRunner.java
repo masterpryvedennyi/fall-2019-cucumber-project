@@ -7,12 +7,14 @@ import org.junit.runner.RunWith;
 @RunWith(Cucumber.class)
 @CucumberOptions(
         plugin = {"html:target/default-cucumber-reports",
-                "rerun:target/rerun.txt"
+                "rerun:target/rerun.txt",
+                "json:target/cucumber.json",
+                "pretty"
         },
         features = "src/test/resources/features",
         glue = "com/cybertek/library/step_definitions",
         dryRun = false,
-        tags = "@regression"
+        tags = "@wip"
 )
 public class CukesRunner {
 

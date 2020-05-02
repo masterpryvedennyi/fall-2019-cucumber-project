@@ -1,6 +1,6 @@
 Feature: Add new users dialog
 
-  @wip
+  @regression
   Scenario: Placeholder tests
     Given I am on the login page
     And I login using following credentials:
@@ -13,7 +13,7 @@ Feature: Add new users dialog
       | email    | Email     |
       | password | Password  |
       | address  |           |
-
+  @regression
   Scenario: verify user information
     Given I am on the login page
     And I login using following credentials:

@@ -4,6 +4,7 @@ import com.cybertek.library.pages.DashboardPage;
 import com.cybertek.library.pages.UsersPage;
 import com.cybertek.library.utilities.BrowserUtils;
 import com.cybertek.library.utilities.Driver;
+import com.cybertek.library.utilities.LibraryConstants;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.junit.Assert;
@@ -71,7 +72,24 @@ public class PageNavigationStepDefs {
         BrowserUtils.wait(1);
         int actualCount = usersPage.allRows.size();
         Assert.assertEquals(expectedCount, actualCount);
-
     }
+
+    @When("I go/navigate to {string} page")
+    public void i_go_to_page(String page) {
+        switch (page){
+            case LibraryConstants.DASHBOARD:
+                dashBoardPage.dashboard.click();
+                break;
+            case LibraryConstants.USERS:
+                dashBoardPage.users.click();
+                break;
+            case LibraryConstants.BOOKS:
+                dashBoardPage.books.click();
+                break;
+            default:
+                Assert.fail("No such page " + page);
+        }
+    }
+
 
 }

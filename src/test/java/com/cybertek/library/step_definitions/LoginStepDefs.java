@@ -4,6 +4,7 @@ import com.cybertek.library.pages.LoginPage;
 import com.cybertek.library.utilities.BrowserUtils;
 import com.cybertek.library.utilities.ConfigurationReader;
 import com.cybertek.library.utilities.Driver;
+import com.cybertek.library.utilities.LibraryConstants;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -60,6 +61,26 @@ public class LoginStepDefs {
     public void i_login_using_following_credentials(Map<String, String> credentials) {
         String email = credentials.get("email");
         String password = credentials.get("password");
+        loginPage.login(email, password);
+    }
+
+    @Given("I login to application as a {word}")
+    public void i_login_to_application_as_a_(String user) throws Exception {
+        String email = null, password = null;
+
+        switch (user.toLowerCase()){
+            case LibraryConstants.LIBRARIAN:
+                email = ConfigurationReader.getProperty("librarian_email");
+                password = ConfigurationReader.getProperty("librarian_password");
+                break;
+            case LibraryConstants.STUDENT:
+                email = ConfigurationReader.getProperty("student_email");
+                password = ConfigurationReader.getProperty("student_password");
+                break;
+            default:
+//                Assert.fail("Wrong user type is provided: " + user);
+                throw new Exception("Wrong user type is provided: " + user);
+        }
         loginPage.login(email, password);
     }
 

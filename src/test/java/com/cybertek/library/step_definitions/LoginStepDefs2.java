@@ -1,25 +1,28 @@
 package com.cybertek.library.step_definitions;
 
 import com.cybertek.library.pages.LoginPage;
+import com.cybertek.library.utilities.BrowserUtils;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
 public class LoginStepDefs2 {
     LoginPage loginPage = new LoginPage();
 
+
     @When("I enter username {string}")
     public void i_enter_username(String username) {
-        System.out.println("Enter username: " + username);
+        BrowserUtils.fluentWait(loginPage.email, 3);
+        loginPage.email.sendKeys(username);
     }
 
     @When("I enter password {string}")
     public void i_enter_password(String password) {
-        System.out.println("Enter password: " + password);
+        loginPage.password.sendKeys(password);
     }
 
     @When("I click the sign in button")
     public void i_click_the_sign_in_button() {
-        System.out.println("Click on sign in button");
+        loginPage.signIn.click();
     }
 
     @Then("there should be {int} users")
